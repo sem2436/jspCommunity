@@ -48,29 +48,51 @@ public class ArticleDao {
 		sql.append("ON A.memberId = M.id");
 		sql.append("INNER JOIN `board` AS B");
 		sql.append("ON A.boardId = B.id");
-		sql.append("WHERE A.boardId = ?", id);
+		sql.append("WHERE A.id = ?", id);
 		
 		Map<String, Object> map = MysqlUtil.selectRow(sql);
-
-		if(map.isEmpty()) {
+		
+		if ( map.isEmpty() ) {
 			return null;
 		}
-		
+
 		return new Article(map);
 	}
 
 	public Board getBoardById(int id) {
 		SecSql sql = new SecSql();
 		sql.append("SELECT B.*");
-		sql.append("FROM article AS B");
-		sql.append("WHERE B.boardId = ?", id);
+		sql.append("FROM board AS B");
+		sql.append("WHERE B.id = ?", id);
 		
 		Map<String, Object> map = MysqlUtil.selectRow(sql);
-
-		if(map.isEmpty()) {
+		
+		if ( map.isEmpty() ) {
 			return null;
 		}
-		
+
 		return new Board(map);
+	}
+
+	public int write(Map<String, Object> args) {
+		SecSql sql = new SecSql();
+		sql.append("INSERT INTO article");
+		sql.append("SET regDate = NOW()");
+		sql.append(", updateDate = NOW()");
+		sql.append(", boardId = ?", args.get("boardId"));
+		sql.append(", memberId = ?", args.get("memberId"));
+		sql.append(", title = ?", args.get("title"));
+		sql.append(", body = ?", args.get("body"));
+		
+		return MysqlUtil.insert(sql);
+	}
+
+	public int delete(int id) {
+		SecSql sql = new SecSql();
+		sql.append("DELETE FROM article");
+		sql.append("WHERE id = ?", id);
+		
+		return MysqlUtil.delete(sql);
+				
 	}
 }
